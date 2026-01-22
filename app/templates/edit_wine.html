@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Wine - Wine Tracker{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 1rem;">Edit Wine</h2>
+
+<div class="card">
+    <form method="POST" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label for="vineyard">Vineyard</label>
+                <input type="text" id="vineyard" name="vineyard" value="{{ wine.vineyard or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="varietal">Varietal</label>
+                <input type="text" id="varietal" name="varietal" value="{{ wine.varietal or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="vintage">Vintage</label>
+                <input type="number" id="vintage" name="vintage" min="1900" max="2100" value="{{ wine.vintage or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="date_had">Date Had</label>
+                <input type="date" id="date_had" name="date_had" value="{{ wine.date_had.isoformat() if wine.date_had else '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="origin">Origin</label>
+                <input type="text" id="origin" name="origin" value="{{ wine.origin or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="rating">Rating (0-5)</label>
+                <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" value="{{ wine.rating or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="purchase_location">Purchase Location</label>
+                <input type="text" id="purchase_location" name="purchase_location" value="{{ wine.purchase_location or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="wine_club_month">Wine Club Month</label>
+                <input type="text" id="wine_club_month" name="wine_club_month" value="{{ wine.wine_club_month or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="price">Price ($)</label>
+                <input type="number" id="price" name="price" step="0.01" min="0" value="{{ wine.price or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="photo">Wine Label Photo</label>
+                <input type="file" id="photo" name="photo" accept="image/*">
+                {% if wine.photo_filename %}
+                <small style="display: block; margin-top: 0.5rem; color: #666;">Current: {{ wine.photo_filename }}</small>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes">{{ wine.notes or '' }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <input type="checkbox" id="is_favorite" name="is_favorite" {% if wine.is_favorite %}checked{% endif %}>
+            <label for="is_favorite" style="display: inline;">Mark as Favorite</label>
+        </div>
+        
+        {% if wine.photo_filename %}
+        <div style="margin-bottom: 1rem;">
+            <img src="{{ url_for('static', filename='../uploads/' + wine.photo_filename) }}" 
+                 alt="Wine label" class="wine-photo">
+        </div>
+        {% endif %}
+        
+        <div style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="btn">Update Wine</button>
+            <a href="{{ url_for('main.wines') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

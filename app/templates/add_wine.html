@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Add Wine - Wine Tracker{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 1rem;">Add New Wine</h2>
+
+<div class="card">
+    <form method="POST" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label for="vineyard">Vineyard</label>
+                <input type="text" id="vineyard" name="vineyard">
+            </div>
+            
+            <div class="form-group">
+                <label for="varietal">Varietal</label>
+                <input type="text" id="varietal" name="varietal">
+            </div>
+            
+            <div class="form-group">
+                <label for="vintage">Vintage</label>
+                <input type="number" id="vintage" name="vintage" min="1900" max="2100">
+            </div>
+            
+            <div class="form-group">
+                <label for="date_had">Date Had</label>
+                <input type="date" id="date_had" name="date_had">
+            </div>
+            
+            <div class="form-group">
+                <label for="origin">Origin</label>
+                <input type="text" id="origin" name="origin" placeholder="e.g., Napa Valley, CA">
+            </div>
+            
+            <div class="form-group">
+                <label for="rating">Rating (0-5)</label>
+                <input type="number" id="rating" name="rating" min="0" max="5" step="0.1">
+            </div>
+            
+            <div class="form-group">
+                <label for="purchase_location">Purchase Location</label>
+                <input type="text" id="purchase_location" name="purchase_location">
+            </div>
+            
+            <div class="form-group">
+                <label for="wine_club_month">Wine Club Month</label>
+                <input type="text" id="wine_club_month" name="wine_club_month" placeholder="e.g., January 2024">
+            </div>
+            
+            <div class="form-group">
+                <label for="price">Price ($)</label>
+                <input type="number" id="price" name="price" step="0.01" min="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="photo">Wine Label Photo</label>
+                <input type="file" id="photo" name="photo" accept="image/*">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" placeholder="Tasting notes, food pairings, etc."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <input type="checkbox" id="is_favorite" name="is_favorite">
+            <label for="is_favorite" style="display: inline;">Mark as Favorite</label>
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="btn">Add Wine</button>
+            <a href="{{ url_for('main.wines') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
