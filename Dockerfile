@@ -14,14 +14,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY app/ ./app/
 COPY run.py .
+COPY wsgi.py .
 COPY create_admin.py .
 
 # Create necessary directories
 RUN mkdir -p /app/data /app/backups /app/uploads
 
 # Set permissions
-RUN chmod +x run.py
+RUN chmod +x run.py wsgi.py
 
 EXPOSE 5000
 
-CMD ["python", "run.py"]
+# Use wsgi.py as the entry point with unbuffered output
+CMD ["python", "-u", "wsgi.py"]
