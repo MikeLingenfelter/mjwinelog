@@ -8,4 +8,5 @@ if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     
     # Run the application
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    # Use threaded=True to allow APScheduler to work properly
+    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)

@@ -1,4 +1,5 @@
 import os
+import atexit
 from flask import Flask
 from flask_login import LoginManager
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -42,13 +43,18 @@ def create_app():
     app.register_blueprint(admin)
     
     # Setup automated backups (daily at 2 AM)
-    scheduler = BackgroundScheduler()
+    # Only start scheduler if not in debug/testing mode
+    scheduler = BackgroundScheduler(daemon=True)
     scheduler.add_job(
         func=lambda: backup_database(app),
         trigger="cron",
         hour=2,
-        minute=0
+        minute=0,
+        id='daily_backup'
     )
     scheduler.start()
+    
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
     
     return app
