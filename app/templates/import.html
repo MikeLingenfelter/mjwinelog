@@ -1,139 +1,48 @@
 {% extends "base.html" %}
 
-{% block title %}Statistics - Wine Tracker{% endblock %}
-
-{% block extra_css %}
-<style>
-    .stat-card {
-        background: linear-gradient(135deg, #6b2d5c 0%, #8b3d6c 100%);
-        color: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        text-align: center;
-    }
-    
-    .stat-value {
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin: 0.5rem 0;
-    }
-    
-    .stat-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-    }
-    
-    .chart-container {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-    
-    .bar {
-        height: 30px;
-        background: #6b2d5c;
-        margin: 0.5rem 0;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        padding: 0 1rem;
-        color: white;
-        font-size: 0.9rem;
-    }
-</style>
-{% endblock %}
+{% block title %}Import Wines - Wine Tracker{% endblock %}
 
 {% block content %}
-<h2 style="margin-bottom: 1rem;">Wine Collection Statistics</h2>
+<h2 style="margin-bottom: 1rem;">Import Wines from CSV</h2>
 
-{% if stats %}
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-    <div class="stat-card">
-        <div class="stat-label">Total Wines</div>
-        <div class="stat-value">{{ stats.total_wines }}</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-label">Average Rating</div>
-        <div class="stat-value">{{ '%.1f'|format(stats.avg_rating) }}</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-label">Total Spent</div>
-        <div class="stat-value">${{ '%.2f'|format(stats.total_spent) }}</div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-label">Favorites</div>
-        <div class="stat-value">{{ stats.favorites_count }}</div>
-    </div>
-</div>
-
-<div class="chart-container">
-    <h3 style="margin-bottom: 1rem;">Top Rated Varietals (Average Rating)</h3>
-    {% for varietal, rating in stats.top_varietals %}
-    <div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-            <span><strong>{{ varietal }}</strong></span>
-            <span>{{ '%.1f'|format(rating) }}</span>
-        </div>
-        <div class="bar" style="width: {{ (rating / 5 * 100)|int }}%;">
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<div class="chart-container">
-    <h3 style="margin-bottom: 1rem;">Most Common Varietals</h3>
-    {% set max_count = stats.count_by_varietal[0][1] if stats.count_by_varietal else 1 %}
-    {% for varietal, count in stats.count_by_varietal %}
-    <div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-            <span><strong>{{ varietal }}</strong></span>
-            <span>{{ count }} wines</span>
-        </div>
-        <div class="bar" style="width: {{ (count / max_count * 100)|int }}%;">
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<div class="chart-container">
-    <h3 style="margin-bottom: 1rem;">Rating Distribution</h3>
-    {% set max_rating_count = stats.rating_distribution.values()|max %}
-    {% for rating in [5, 4, 3, 2, 1] %}
-    <div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-            <span><strong>{{ rating }} Stars</strong></span>
-            <span>{{ stats.rating_distribution[rating] }} wines</span>
-        </div>
-        <div class="bar" style="width: {{ (stats.rating_distribution[rating] / max_rating_count * 100)|int if max_rating_count > 0 else 0 }}%;">
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-{% if stats.wines_by_month %}
-<div class="chart-container">
-    <h3 style="margin-bottom: 1rem;">Wines Tasted by Month</h3>
-    {% set max_month_count = stats.wines_by_month|map(attribute='1')|max %}
-    {% for month, count in stats.wines_by_month[-12:] %}
-    <div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-            <span><strong>{{ month }}</strong></span>
-            <span>{{ count }} wines</span>
-        </div>
-        <div class="bar" style="width: {{ (count / max_month_count * 100)|int }}%;">
-        </div>
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-
-{% else %}
 <div class="card">
-    <p style="text-align: center; color: #666;">No wines in your collection yet. <a href="{{ url_for('main.add_wine') }}">Add your first wine!</a></p>
+    <h3 style="margin-bottom: 1rem;">Upload CSV File</h3>
+    
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Choose CSV file</label>
+            <input type="file" id="file" name="file" accept=".csv" required>
+        </div>
+        
+        <button type="submit" class="btn">Import Wines</button>
+    </form>
+    
+    <hr style="margin: 2rem 0; border: none; border-top: 1px solid #ddd;">
+    
+    <h3 style="margin-bottom: 1rem;">CSV Format Requirements</h3>
+    <p style="margin-bottom: 1rem;">Your CSV file should have the following columns (column names must match exactly):</p>
+    
+    <ul style="margin-left: 2rem; margin-bottom: 1rem;">
+        <li><strong>Vineyard</strong> - Name of the vineyard</li>
+        <li><strong>Varietal</strong> - Type of wine (e.g., Cabernet Sauvignon, Pinot Noir)</li>
+        <li><strong>Vintage</strong> - Year (e.g., 2018)</li>
+        <li><strong>Date Had</strong> - Date you tasted it (YYYY-MM-DD format)</li>
+        <li><strong>Origin</strong> - Where the wine is from (e.g., Napa Valley, CA)</li>
+        <li><strong>Rating</strong> - Your rating (0-5, decimals allowed)</li>
+        <li><strong>Purchase Location</strong> - Where you bought it</li>
+        <li><strong>Wine Club Month</strong> - Month received if from wine club</li>
+        <li><strong>Price</strong> - Price in dollars (e.g., 45.99)</li>
+        <li><strong>Notes</strong> - Your tasting notes</li>
+        <li><strong>Is Favorite</strong> - True/False or 1/0</li>
+    </ul>
+    
+    <h4 style="margin-bottom: 0.5rem;">Example CSV:</h4>
+    <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.9rem;">Vineyard,Varietal,Vintage,Date Had,Origin,Rating,Purchase Location,Wine Club Month,Price,Notes,Is Favorite
+Stag's Leap,Cabernet Sauvignon,2018,2024-01-15,Napa Valley,4.5,Local Wine Shop,,55.00,Bold with dark fruit notes,True
+Cloudy Bay,Sauvignon Blanc,2022,2024-01-20,Marlborough,4.0,Wine.com,January 2024,28.00,Crisp and citrusy,False</pre>
+    
+    <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+        <strong>Note:</strong> All fields are optional except the column headers. Empty cells will be imported as blank values.
+    </p>
 </div>
-{% endif %}
 {% endblock %}
