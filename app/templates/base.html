@@ -1,295 +1,182 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Wine Tracker{% endblock %}</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f5f5f5;
-        }
-        
-        .navbar {
-            background: #6b2d5c;
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .navbar h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        
-        .nav-links a:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        
-        .flash-messages {
-            margin-bottom: 1rem;
-        }
-        
-        .flash {
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 0.5rem;
-        }
-        
-        .flash.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .flash.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 1rem;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: #6b2d5c;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.2s;
-        }
-        
-        .btn:hover {
-            background: #552447;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-        
-        .btn-danger {
-            background: #dc3545;
-        }
-        
-        .btn-danger:hover {
-            background: #c82333;
-        }
-        
-        .btn-small {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.9rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-        
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .form-group input[type="checkbox"] {
-            width: auto;
-            margin-right: 0.5rem;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-        
-        th, td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        th:hover {
-            background: #e9ecef;
-        }
-        
-        tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .filters {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .filter-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .favorite-star {
-            cursor: pointer;
-            font-size: 1.5rem;
-            color: #ddd;
-            transition: color 0.2s;
-        }
-        
-        .favorite-star.active {
-            color: #ffd700;
-        }
-        
-        .wine-photo {
-            max-width: 200px;
-            max-height: 200px;
-            border-radius: 4px;
-        }
-        
-        @media (max-width: 768px) {
-            .navbar-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .nav-links {
-                margin-top: 1rem;
-                width: 100%;
-            }
-            
-            table {
-                font-size: 0.9rem;
-            }
-            
-            th, td {
-                padding: 0.5rem;
-            }
-            
-            .filter-row {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-    {% block extra_css %}{% endblock %}
-</head>
-<body>
-    <nav class="navbar">
-        <div class="navbar-content">
-            <h1>🍷 Wine Tracker</h1>
-            {% if current_user.is_authenticated %}
-            <div class="nav-links">
-                <a href="{{ url_for('main.wines') }}">My Wines</a>
-                <a href="{{ url_for('main.add_wine') }}">Add Wine</a>
-                <a href="{{ url_for('main.statistics') }}">Statistics</a>
-                <a href="{{ url_for('main.import_wines') }}">Import</a>
-                <a href="{{ url_for('main.export_wines') }}">Export</a>
-                {% if current_user.is_admin() %}
-                <a href="{{ url_for('admin.index') }}">Admin</a>
-                {% endif %}
-                <a href="{{ url_for('auth.logout') }}">Logout ({{ current_user.username }})</a>
-            </div>
-            {% endif %}
-        </div>
-    </nav>
-    
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="flash {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-        
-        {% block content %}{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Statistics - Wine Tracker{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(150deg, var(--wine-darker) 0%, var(--wine) 100%);
+        color: #fff;
+        padding: 1.4rem 1.5rem;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lift);
+    }
+
+    .stat-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--gold-soft);
+    }
+
+    .stat-value {
+        font-family: 'Fraunces', Georgia, serif;
+        font-size: 2.3rem;
+        font-weight: 600;
+        line-height: 1.2;
+        margin-top: 0.35rem;
+    }
+
+    .chart-title {
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .bar-row { margin-bottom: 0.9rem; }
+
+    .bar-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.3rem;
+        font-size: 0.9rem;
+    }
+
+    .bar-meta .value { color: var(--ink-soft); font-size: 0.84rem; }
+
+    .bar-track {
+        height: 10px;
+        background: var(--paper);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--wine) 0%, #9c4a6e 100%);
+        min-width: 4px;
+    }
+
+    .bar-fill.gold {
+        background: linear-gradient(90deg, var(--gold) 0%, #e0c86a 100%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Statistics</h2>
+        <p class="subtitle">A look across your tasting history</p>
     </div>
-    
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
-EOF
+</div>
 
-# Now rebuild the container
-docker compose down
-docker compose build --no-cache
-docker compose up -d
+{% if stats %}
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Wines</div>
+        <div class="stat-value">{{ stats.total_wines }}</div>
+    </div>
 
-# Test it
-curl http://localhost:5000/login | head -20
+    <div class="stat-card">
+        <div class="stat-label">Average Rating</div>
+        <div class="stat-value">{{ '%.1f'|format(stats.avg_rating) }} <span style="font-size: 1.1rem; color: var(--gold-soft);">★</span></div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Total Spent</div>
+        <div class="stat-value">${{ '%.0f'|format(stats.total_spent) }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Favorites</div>
+        <div class="stat-value">{{ stats.favorites_count }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 class="chart-title">Top Rated Varietals</h3>
+    {% for varietal, rating in stats.top_varietals %}
+    <div class="bar-row">
+        <div class="bar-meta">
+            <strong>{{ varietal }}</strong>
+            <span class="value">{{ '%.1f'|format(rating) }} ★</span>
+        </div>
+        <div class="bar-track">
+            <div class="bar-fill gold" style="width: {{ (rating / 5 * 100)|int }}%;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <h3 class="chart-title">Most Common Varietals</h3>
+    {% set max_count = stats.count_by_varietal[0][1] if stats.count_by_varietal else 1 %}
+    {% for varietal, count in stats.count_by_varietal %}
+    <div class="bar-row">
+        <div class="bar-meta">
+            <strong>{{ varietal }}</strong>
+            <span class="value">{{ count }} wine{{ 's' if count != 1 else '' }}</span>
+        </div>
+        <div class="bar-track">
+            <div class="bar-fill" style="width: {{ (count / max_count * 100)|int }}%;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <h3 class="chart-title">Rating Distribution</h3>
+    {% set max_rating_count = stats.rating_distribution.values()|max %}
+    {% for rating in [5, 4, 3, 2, 1] %}
+    <div class="bar-row">
+        <div class="bar-meta">
+            <strong>{{ rating }} ★</strong>
+            <span class="value">{{ stats.rating_distribution[rating] }} wine{{ 's' if stats.rating_distribution[rating] != 1 else '' }}</span>
+        </div>
+        <div class="bar-track">
+            <div class="bar-fill gold" style="width: {{ (stats.rating_distribution[rating] / max_rating_count * 100)|int if max_rating_count > 0 else 0 }}%;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if stats.wines_by_month %}
+<div class="card">
+    <h3 class="chart-title">Wines Tasted by Month <span style="font-family: 'Inter'; font-size: 0.8rem; font-weight: 400; color: var(--ink-soft);">(last 12 months)</span></h3>
+    {% set max_month_count = stats.wines_by_month|map(attribute='1')|max %}
+    {% for month, count in stats.wines_by_month[-12:] %}
+    <div class="bar-row">
+        <div class="bar-meta">
+            <strong>{{ month }}</strong>
+            <span class="value">{{ count }} wine{{ 's' if count != 1 else '' }}</span>
+        </div>
+        <div class="bar-track">
+            <div class="bar-fill" style="width: {{ (count / max_month_count * 100)|int }}%;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <span class="glass">📊</span>
+        <h3 style="margin-bottom: 0.4rem;">No data yet</h3>
+        <p style="margin-bottom: 1.25rem;">Statistics will appear once you've logged some wines.</p>
+        <a href="{{ url_for('main.add_wine') }}" class="btn">Add Your First Wine</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -3,7 +3,13 @@
 {% block title %}My Wines - Wine Tracker{% endblock %}
 
 {% block content %}
-<h2 style="margin-bottom: 1rem;">My Wine Collection ({{ wines|length }} wines)</h2>
+<div class="page-header">
+    <div>
+        <h2>My Cellar</h2>
+        <p class="subtitle">{{ wines|length }} wine{{ 's' if wines|length != 1 else '' }} in your collection</p>
+    </div>
+    <a href="{{ url_for('main.add_wine') }}" class="btn">+ Add Wine</a>
+</div>
 
 <div class="filters">
     <form method="GET" id="filterForm">
@@ -12,7 +18,7 @@
                 <label for="search">Search</label>
                 <input type="text" id="search" name="search" placeholder="Vineyard, varietal, notes..." value="{{ current_filters.search }}">
             </div>
-            
+
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="varietal">Varietal</label>
                 <select id="varietal" name="varietal">
@@ -22,7 +28,7 @@
                     {% endfor %}
                 </select>
             </div>
-            
+
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="origin">Origin</label>
                 <select id="origin" name="origin">
@@ -32,68 +38,67 @@
                     {% endfor %}
                 </select>
             </div>
-        </div>
-        
-        <div class="filter-row">
+
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="rating_min">Min Rating</label>
                 <input type="number" id="rating_min" name="rating_min" min="0" max="5" step="0.1" value="{{ current_filters.rating_min }}">
             </div>
-            
+
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="rating_max">Max Rating</label>
                 <input type="number" id="rating_max" name="rating_max" min="0" max="5" step="0.1" value="{{ current_filters.rating_max }}">
             </div>
-            
-            <div class="form-group" style="margin-bottom: 0;">
-                <label>&nbsp;</label>
-                <div>
-                    <input type="checkbox" id="favorites" name="favorites" value="true" {% if current_filters.favorites %}checked{% endif %}>
-                    <label for="favorites" style="display: inline; margin-bottom: 0;">Favorites Only</label>
-                </div>
-            </div>
         </div>
-        
-        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-            <button type="submit" class="btn">Apply Filters</button>
-            <a href="{{ url_for('main.wines') }}" class="btn btn-secondary">Clear</a>
+
+        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-small">Apply Filters</button>
+            <a href="{{ url_for('main.wines') }}" class="btn btn-small btn-secondary">Clear</a>
+            <label style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.88rem; color: var(--ink-soft); cursor: pointer; margin-left: 0.25rem;">
+                <input type="checkbox" name="favorites" value="true" style="accent-color: var(--wine);" {% if current_filters.favorites %}checked{% endif %}
+                       onchange="document.getElementById('filterForm').submit();">
+                ★ Favorites only
+            </label>
         </div>
     </form>
 </div>
 
 {% if wines %}
-<div class="card" style="overflow-x: auto;">
+<div class="card table-wrap" style="padding: 0.5rem 0.75rem;">
     <table>
         <thead>
             <tr>
-                <th></th>
-                <th><a href="?sort=vineyard&order={% if current_filters.sort == 'vineyard' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}&{{ request.query_string.decode() | replace('sort=' + current_filters.sort, '') | replace('order=' + current_filters.order, '') }}">Vineyard</a></th>
-                <th><a href="?sort=varietal&order={% if current_filters.sort == 'varietal' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}&{{ request.query_string.decode() | replace('sort=' + current_filters.sort, '') | replace('order=' + current_filters.order, '') }}">Varietal</a></th>
-                <th><a href="?sort=vintage&order={% if current_filters.sort == 'vintage' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}&{{ request.query_string.decode() | replace('sort=' + current_filters.sort, '') | replace('order=' + current_filters.order, '') }}">Vintage</a></th>
-                <th><a href="?sort=date_had&order={% if current_filters.sort == 'date_had' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}&{{ request.query_string.decode() | replace('sort=' + current_filters.sort, '') | replace('order=' + current_filters.order, '') }}">Date Had</a></th>
-                <th><a href="?sort=rating&order={% if current_filters.sort == 'rating' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}&{{ request.query_string.decode() | replace('sort=' + current_filters.sort, '') | replace('order=' + current_filters.order, '') }}">Rating</a></th>
+                <th style="width: 2.5rem;"></th>
+                <th><a href="?sort=vineyard&order={% if current_filters.sort == 'vineyard' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}">Vineyard {% if current_filters.sort == 'vineyard' %}{{ '▲' if current_filters.order == 'asc' else '▼' }}{% endif %}</a></th>
+                <th><a href="?sort=varietal&order={% if current_filters.sort == 'varietal' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}">Varietal {% if current_filters.sort == 'varietal' %}{{ '▲' if current_filters.order == 'asc' else '▼' }}{% endif %}</a></th>
+                <th><a href="?sort=vintage&order={% if current_filters.sort == 'vintage' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}">Vintage {% if current_filters.sort == 'vintage' %}{{ '▲' if current_filters.order == 'asc' else '▼' }}{% endif %}</a></th>
+                <th><a href="?sort=date_had&order={% if current_filters.sort == 'date_had' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}">Date Had {% if current_filters.sort == 'date_had' %}{{ '▲' if current_filters.order == 'asc' else '▼' }}{% endif %}</a></th>
+                <th><a href="?sort=rating&order={% if current_filters.sort == 'rating' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}">Rating {% if current_filters.sort == 'rating' %}{{ '▲' if current_filters.order == 'asc' else '▼' }}{% endif %}</a></th>
                 <th>Origin</th>
-                <th>Price</th>
-                <th>Actions</th>
+                <th><a href="?sort=price&order={% if current_filters.sort == 'price' and current_filters.order == 'asc' %}desc{% else %}asc{% endif %}">Price {% if current_filters.sort == 'price' %}{{ '▲' if current_filters.order == 'asc' else '▼' }}{% endif %}</a></th>
+                <th style="text-align: right;">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for wine in wines %}
             <tr>
                 <td>
-                    <span class="favorite-star {% if wine.is_favorite %}active{% endif %}" 
-                          onclick="toggleFavorite({{ wine.id }}, this)">★</span>
+                    <span class="favorite-star {% if wine.is_favorite %}active{% endif %}"
+                          onclick="toggleFavorite({{ wine.id }}, this)" title="Toggle favorite">★</span>
                 </td>
-                <td>{{ wine.vineyard or '-' }}</td>
-                <td>{{ wine.varietal or '-' }}</td>
-                <td>{{ wine.vintage or '-' }}</td>
-                <td>{{ wine.date_had.strftime('%Y-%m-%d') if wine.date_had else '-' }}</td>
-                <td>{{ '%.1f'|format(wine.rating) if wine.rating else '-' }}</td>
-                <td>{{ wine.origin or '-' }}</td>
-                <td>{{ '$%.2f'|format(wine.price) if wine.price else '-' }}</td>
+                <td style="font-weight: 600;">{{ wine.vineyard or '—' }}</td>
+                <td>{% if wine.varietal %}<span class="badge">{{ wine.varietal }}</span>{% else %}—{% endif %}</td>
+                <td>{{ wine.vintage or '—' }}</td>
+                <td style="color: var(--ink-soft);">{{ wine.date_had.strftime('%b %d, %Y') if wine.date_had else '—' }}</td>
                 <td>
+                    {% if wine.rating %}
+                    <span class="rating-display">★<span class="num">{{ '%.1f'|format(wine.rating) }}</span></span>
+                    {% else %}—{% endif %}
+                </td>
+                <td style="color: var(--ink-soft);">{{ wine.origin or '—' }}</td>
+                <td>{{ '$%.2f'|format(wine.price) if wine.price else '—' }}</td>
+                <td style="text-align: right;">
                     <a href="{{ url_for('main.edit_wine', id=wine.id) }}" class="btn btn-small btn-secondary">Edit</a>
-                    <form method="POST" action="{{ url_for('main.delete_wine', id=wine.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this wine?');">
+                    <form method="POST" action="{{ url_for('main.delete_wine', id=wine.id) }}" style="display: inline;" onsubmit="return confirm('Delete this wine?');">
                         <button type="submit" class="btn btn-small btn-danger">Delete</button>
                     </form>
                 </td>
@@ -104,7 +109,12 @@
 </div>
 {% else %}
 <div class="card">
-    <p style="text-align: center; color: #666;">No wines found. <a href="{{ url_for('main.add_wine') }}">Add your first wine!</a></p>
+    <div class="empty-state">
+        <span class="glass">🍇</span>
+        <h3 style="margin-bottom: 0.4rem;">Your cellar is empty</h3>
+        <p style="margin-bottom: 1.25rem;">Start building your tasting history.</p>
+        <a href="{{ url_for('main.add_wine') }}" class="btn">Add Your First Wine</a>
+    </div>
 </div>
 {% endif %}
 
@@ -112,18 +122,12 @@
 function toggleFavorite(wineId, element) {
     fetch(`/wine/toggle_favorite/${wineId}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+        headers: { 'Content-Type': 'application/json' }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            if (data.is_favorite) {
-                element.classList.add('active');
-            } else {
-                element.classList.remove('active');
-            }
+            element.classList.toggle('active', data.is_favorite);
         }
     });
 }
